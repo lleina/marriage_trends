@@ -3,12 +3,76 @@
 <head>
     <!---Imports d3--->
     <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        .gridlines line {
+            stroke: #bbb;
+        }
+
+        .gridlines .domain {
+            stroke: none;
+        }
+    </style>
 </head>
 
 <body>
-    <svg id="chartsvg" height="600" width="600" style="border:1px solid rgb(0, 0, 0)"></svg>
+    <svg id="linesvg" height="500" width="800" style="border:1px solid rgb(0, 0, 0)"></svg>
 
     <script>
+        const linesvg = d3.select("svg#linesvg");
+        width = linesvg.attr("width");
+        height = linesvg.attr("height");
+        const margins = { top: 10, right: 10, bottom: 50, left: 50 };
+        const lineWidth = width - margins.left - margins.right;
+        const lineHeight = height - margins.top - margins.bottom;
 
+        const requestData = async function () {
+
+            d3.csv('./both_sexes.csv', d3.autoType)
+                .then((data) => {
+
+                    yearExtent = d3.extent(data, d => d['year']);
+                    console.log(yearExtent);
+                    yearScale = d3.scaleLinear().domain(yearExtent).range([0, lineWidth])
+
+                    marriageExtent = d3.extent(data, d => (1 - d['all_2534']));
+                    // console.log(marriageExtent)
+                    marriageScale = d3.scaleLinear().domain(marriageExtent).range([lineHeight, 0])
+
+                    let leftAxis = d3.axisLeft(marriageScale)
+                        .tickFormat(d3.format('.0%'))
+                        .ticks(8);
+                    linesvg.append('g')
+                        .attr('class', 'y axis')
+                        .attr('transform', `translate(${margins.left - 10},${margins.top})`)
+                        .call(leftAxis);
+
+                    let leftGridlines = d3.axisLeft(marriageScale)
+                        .tickSize(-lineWidth - 10)
+                        .tickFormat('');
+                    linesvg.append('g').attr('class', 'gridlines')
+                        .attr('transform', `translate(${margins.left - 10},${margins.top})`)
+                        .call(leftGridlines)
+
+
+                    let bottomAxis = d3.axisBottom(yearScale)
+                        .tickFormat(d3.format('d'))
+                    linesvg.append('g')
+                        .attr('class', 'y axis')
+                        .attr('transform', `translate(${margins.left},${lineHeight + margins.top + 10})`)
+                        .call(bottomAxis);
+                    let bottomGridlines = d3.axisBottom(yearScale)
+                        .tickSize(-lineHeight - 10)
+                        .tickFormat('')
+                        .ticks(8);
+                    linesvg.append('g').attr('class', 'gridlines')
+                        .attr('transform', `translate(${margins.left},${lineHeight + margins.top + 10})`)
+                        .call(bottomGridlines);
+
+
+
+                })
+        }
+
+        requestData();
     </script>
 </body>
