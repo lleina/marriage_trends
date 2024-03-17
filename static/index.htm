@@ -1,5 +1,4 @@
 <html>
-
 <head>
     <!---Imports d3--->
     <script src="https://d3js.org/d3.v7.min.js"></script>
@@ -11,16 +10,27 @@
         .gridlines .domain {
             stroke: none;
         }
+        
+        .line {
+            fill: none;
+            stroke: steelblue;
+            stroke-width: 2;
+        }
+        
+        .dot {
+            fill: white;
+            stroke: steelblue;
+            stroke-width: 2;
+        }
     </style>
 </head>
-
 <body>
     <svg id="linesvg" height="500" width="800" style="border:1px solid rgb(0, 0, 0)"></svg>
 
     <script>
         const linesvg = d3.select("svg#linesvg");
-        width = linesvg.attr("width");
-        height = linesvg.attr("height");
+        const width = linesvg.attr("width");
+        const height = linesvg.attr("height");
         const margins = { top: 10, right: 10, bottom: 50, left: 50 };
         const lineWidth = width - margins.left - margins.right;
         const lineHeight = height - margins.top - margins.bottom;
@@ -29,14 +39,31 @@
 
             d3.csv('./both_sexes.csv', d3.autoType)
                 .then((data) => {
+                    const yearExtent = d3.extent(data, d => d['year']);
+                    const yearScale = d3.scaleLinear().domain(yearExtent).range([0, lineWidth])
 
-                    yearExtent = d3.extent(data, d => d['year']);
-                    console.log(yearExtent);
-                    yearScale = d3.scaleLinear().domain(yearExtent).range([0, lineWidth])
+                    const marriageExtent = d3.extent(data, d => (1 - d['all_2534']));
+                    const marriageScale = d3.scaleLinear().domain(marriageExtent).range([lineHeight, 0])
 
-                    marriageExtent = d3.extent(data, d => (1 - d['all_2534']));
-                    // console.log(marriageExtent)
-                    marriageScale = d3.scaleLinear().domain(marriageExtent).range([lineHeight, 0])
+                    const line = d3.line()
+                        .x(d => yearScale(d['year']))
+                        .y(d => marriageScale(1 - d['all_2534']))
+                        .curve(d3.curveMonotoneX); // This makes the line smoother
+
+                    linesvg.append("path")
+                        .datum(data)
+                        .attr("class", "line")
+                        .attr("d", line)
+                        .attr('transform', `translate(${margins.left},${margins.top})`);
+                    
+                    // Adding dots for each data point
+                    linesvg.selectAll(".dot")
+                        .data(data)
+                        .enter().append("circle") // Uses the enter().append() method
+                        .attr("class", "dot") // Assign a class for styling
+                        .attr("cx", d => yearScale(d['year']) + margins.left)
+                        .attr("cy", d => marriageScale(1 - d['all_2534']) + margins.top)
+                        .attr("r", 5);
 
                     let leftAxis = d3.axisLeft(marriageScale)
                         .tickFormat(d3.format('.0%'))
@@ -53,7 +80,6 @@
                         .attr('transform', `translate(${margins.left - 10},${margins.top})`)
                         .call(leftGridlines)
 
-
                     let bottomAxis = d3.axisBottom(yearScale)
                         .tickFormat(d3.format('d'))
                     linesvg.append('g')
@@ -67,12 +93,11 @@
                     linesvg.append('g').attr('class', 'gridlines')
                         .attr('transform', `translate(${margins.left},${lineHeight + margins.top + 10})`)
                         .call(bottomGridlines);
-
-
-
                 })
         }
 
         requestData();
     </script>
 </body>
+</html>
+
