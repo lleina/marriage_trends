@@ -34,7 +34,7 @@
         const linesvg = d3.select("svg#linesvg");
         const width = linesvg.attr("width");
         const height = linesvg.attr("height");
-        const margins = { top: 10, right: 10, bottom: 50, left: 50 };
+        const margins = { top: 20, right: 20, bottom: 50, left: 50 };
         const lineWidth = width - margins.left - margins.right;
         const lineHeight = height - margins.top - margins.bottom;
 
@@ -86,19 +86,68 @@
                         .attr("d", line35)
                         .attr('transform', `translate(${margins.left},${margins.top})`);
 
-                    // Adding dots for each data point
-                    // linesvg.selectAll(".dot")
-                    //     .data(data)
-                    //     .enter()
-                    //     .append("circle")
-                    //     .attr("class", "dot")
-                    //     .attr("cx", d => yearScale(d['year']) + margins.left)
-                    //     .attr("cy", d => marriageScale(1 - d['all_2534']) + margins.top)
-                    //     .attr("r", 5)
-                    //     .append("title") // Adding tooltip functionality
-                    //     .text(d => `Year: ${d['year']}\nMarriage Rate: ${((1 - d['all_2534']) * 100).toFixed(2)}%`)
-                    //     .on("mouseover", mouseOn)
-                    //     .on("mouseout", mouseOut);
+                    let mouseGroup = linesvg.append("g");
+
+                    let xMarker = mouseGroup.append("line")
+                        .attr("id", "xMarker")
+                        .attr("fill", "none")
+                        .attr("stroke", "black")
+                        .attr("stroke-width", 1)
+                        .attr("y1", 10)
+                        .attr("y2", lineHeight + margins.top)
+                        .attr("visibility", "hidden");
+
+                    let yearMarker = mouseGroup.append("text")
+                        .attr("id", "yearMarker")
+                        .attr("fill", "black")
+                        .attr("stroke", "none")
+                        .attr("stroke-width", 1)
+                        .attr("style", "font-family: sans-serif;")
+                        .attr("y", 5)
+                        .attr("visibility", "hidden");
+
+                    let activeRegion = mouseGroup.append("rect")
+                        .attr("id", "activeRegion")
+                        .attr("width", lineWidth)
+                        .attr("height", lineHeight)
+                        .attr("fill", "none")
+                        .attr("pointer-events", "all");
+
+                    activeRegion.on("mouseover", function () {
+                        xMarker.attr("visibility", "visible");
+                        yearMarker.attr("visibility", "visible");
+                    });
+
+                    activeRegion.on("mouseout", function () {
+                        xMarker.attr("visibility", "hidden");
+                        yearMarker.attr("visibility", "hidden");
+                    });
+
+                    mouseGroup.attr('transform', `translate(${margins.left},${10})`);
+                    let findYear = d3.bisector(d => d).center;
+
+                    let years = []
+                    data.forEach((row) => {
+                        const year = row.year;
+                        years.push(year);
+                    })
+                    console.log(years)
+
+                    activeRegion.on("mousemove", function (evt) {
+                        let location = d3.pointer(evt);
+                        let x = location[0];
+                        let xDate = yearScale.invert(x);
+
+                        let index = findYear(years, xDate);
+                        let highlightedYear = years[index];
+
+                        // console.log(highlightedYear)
+                        yearMarker.text(highlightedYear).attr("x", yearScale(highlightedYear)).attr("text-anchor", "middle");
+                        let xPos = yearScale(highlightedYear);
+                        xMarker.attr("x1", xPos).attr("x2", xPos);
+
+                    });
+
 
                     linesvg.selectAll("circle.all2534").data(data)
                         .join("circle")
@@ -137,6 +186,9 @@
                         d3.select(this)
                             .attr("stroke", "black")
                             .attr("stroke-width", 2);
+                        xMarker.attr("visibility", "visible");
+                        yearMarker.attr("visibility", "visible");
+
                     }
 
                     function mouseOut(event, d) {
