@@ -18,7 +18,7 @@
         }
         
         .dot {
-            fill: white;
+            fill: steelblue; /* Fills the circles with the same color as the line */
             stroke: steelblue;
             stroke-width: 2;
         }
@@ -45,6 +45,22 @@
                     const marriageExtent = d3.extent(data, d => (1 - d['all_2534']));
                     const marriageScale = d3.scaleLinear().domain(marriageExtent).range([lineHeight, 0])
 
+                    // Draw gridlines first
+                    let leftGridlines = d3.axisLeft(marriageScale)
+                        .tickSize(-lineWidth - 10)
+                        .tickFormat('');
+                    linesvg.append('g').attr('class', 'gridlines')
+                        .attr('transform', `translate(${margins.left - 10},${margins.top})`)
+                        .call(leftGridlines)
+
+                    let bottomGridlines = d3.axisBottom(yearScale)
+                        .tickSize(-lineHeight - 10)
+                        .tickFormat('')
+                        .ticks(8);
+                    linesvg.append('g').attr('class', 'gridlines')
+                        .attr('transform', `translate(${margins.left},${lineHeight + margins.top + 10})`)
+                        .call(bottomGridlines);
+
                     const line = d3.line()
                         .x(d => yearScale(d['year']))
                         .y(d => marriageScale(1 - d['all_2534']))
@@ -63,8 +79,11 @@
                         .attr("class", "dot") // Assign a class for styling
                         .attr("cx", d => yearScale(d['year']) + margins.left)
                         .attr("cy", d => marriageScale(1 - d['all_2534']) + margins.top)
-                        .attr("r", 5);
+                        .attr("r", 5)
+                        .append("title") // Adding tooltip functionality
+                        .text(d => `Year: ${d['year']}\nMarriage Rate: ${((1 - d['all_2534']) * 100).toFixed(2)}%`);
 
+                    // Axis should be drawn after gridlines
                     let leftAxis = d3.axisLeft(marriageScale)
                         .tickFormat(d3.format('.0%'))
                         .ticks(8);
@@ -73,26 +92,12 @@
                         .attr('transform', `translate(${margins.left - 10},${margins.top})`)
                         .call(leftAxis);
 
-                    let leftGridlines = d3.axisLeft(marriageScale)
-                        .tickSize(-lineWidth - 10)
-                        .tickFormat('');
-                    linesvg.append('g').attr('class', 'gridlines')
-                        .attr('transform', `translate(${margins.left - 10},${margins.top})`)
-                        .call(leftGridlines)
-
                     let bottomAxis = d3.axisBottom(yearScale)
                         .tickFormat(d3.format('d'))
                     linesvg.append('g')
                         .attr('class', 'y axis')
                         .attr('transform', `translate(${margins.left},${lineHeight + margins.top + 10})`)
                         .call(bottomAxis);
-                    let bottomGridlines = d3.axisBottom(yearScale)
-                        .tickSize(-lineHeight - 10)
-                        .tickFormat('')
-                        .ticks(8);
-                    linesvg.append('g').attr('class', 'gridlines')
-                        .attr('transform', `translate(${margins.left},${lineHeight + margins.top + 10})`)
-                        .call(bottomGridlines);
                 })
         }
 
@@ -100,4 +105,6 @@
     </script>
 </body>
 </html>
+
+
 
