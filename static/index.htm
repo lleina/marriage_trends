@@ -106,6 +106,22 @@
                         .attr("y", 5)
                         .attr("visibility", "hidden");
 
+                    let all2534Marker = mouseGroup.append("circle")
+                        .attr("id", "all2534Marker")
+                        .attr("fill", "none")
+                        .attr("stroke", "black")
+                        .attr("stroke-width", 2)
+                        .attr("r", 7)
+                        .attr("visibility", "hidden");
+
+                    let all3544Marker = mouseGroup.append("circle")
+                        .attr("id", "all3544Marker")
+                        .attr("fill", "none")
+                        .attr("stroke", "black")
+                        .attr("stroke-width", 2)
+                        .attr("r", 7)
+                        .attr("visibility", "hidden");
+
                     let activeRegion = mouseGroup.append("rect")
                         .attr("id", "activeRegion")
                         .attr("width", lineWidth)
@@ -116,11 +132,15 @@
                     activeRegion.on("mouseover", function () {
                         xMarker.attr("visibility", "visible");
                         yearMarker.attr("visibility", "visible");
+                        all2534Marker.attr("visibility", "visible");
+                        all3544Marker.attr("visibility", "visible");
                     });
 
                     activeRegion.on("mouseout", function () {
                         xMarker.attr("visibility", "hidden");
                         yearMarker.attr("visibility", "hidden");
+                        all2534Marker.attr("visibility", "hidden");
+                        all3544Marker.attr("visibility", "hidden");
                     });
 
                     mouseGroup.attr('transform', `translate(${margins.left},${10})`);
@@ -131,7 +151,7 @@
                         const year = row.year;
                         years.push(year);
                     })
-                    console.log(years)
+                    // console.log(years)
 
                     activeRegion.on("mousemove", function (evt) {
                         let location = d3.pointer(evt);
@@ -140,11 +160,26 @@
 
                         let index = findYear(years, xDate);
                         let highlightedYear = years[index];
+                        let datarow = []
+                        data.forEach((row) => {
+                            if (row['year'] === highlightedYear) {
+                                datarow.push(row);
+                            }
+                        });
+                        // console.log(datarow)
 
                         // console.log(highlightedYear)
                         yearMarker.text(highlightedYear).attr("x", yearScale(highlightedYear)).attr("text-anchor", "middle");
                         let xPos = yearScale(highlightedYear);
                         xMarker.attr("x1", xPos).attr("x2", xPos);
+
+                        console.log(datarow[0]['all_2534'])
+                        let yPos = marriageScale(1 - datarow[0]['all_2534']);
+                        let yPos2 = marriageScale(1 - datarow[0]['all_3544']);
+
+                        all2534Marker.attr("cx", xPos).attr("cy", yPos + 10);
+                        all3544Marker.attr("cx", xPos).attr("cy", yPos2 + 10);
+
 
                     });
 
