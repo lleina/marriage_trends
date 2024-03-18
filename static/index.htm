@@ -122,6 +122,15 @@
                         .attr("r", 7)
                         .attr("visibility", "hidden");
 
+                    let clickedMarker = linesvg.append("line")
+                        .attr("id", "clickedMarker")
+                        .attr("fill", "none")
+                        .attr("stroke", "black")
+                        .attr("stroke-width", 2)
+                        .attr("y1", 10)
+                        .attr("y2", lineHeight + margins.top)
+                        .attr("visibility", "hidden");
+
                     let activeRegion = mouseGroup.append("rect")
                         .attr("id", "activeRegion")
                         .attr("width", lineWidth)
@@ -153,8 +162,8 @@
                     })
                     // console.log(years)
 
-                    activeRegion.on("mousemove", function (evt) {
-                        let location = d3.pointer(evt);
+                    activeRegion.on("mousemove", function (event) {
+                        let location = d3.pointer(event);
                         let x = location[0];
                         let xDate = yearScale.invert(x);
 
@@ -166,14 +175,14 @@
                                 datarow.push(row);
                             }
                         });
-                        // console.log(datarow)
 
-                        // console.log(highlightedYear)
-                        yearMarker.text(highlightedYear).attr("x", yearScale(highlightedYear)).attr("text-anchor", "middle");
+                        yearMarker.text(highlightedYear)
+                            .attr("x", yearScale(highlightedYear))
+                            .attr("text-anchor", "middle");
                         let xPos = yearScale(highlightedYear);
                         xMarker.attr("x1", xPos).attr("x2", xPos);
 
-                        console.log(datarow[0]['all_2534'])
+                        // console.log(datarow[0]['all_2534'])
                         let yPos = marriageScale(1 - datarow[0]['all_2534']);
                         let yPos2 = marriageScale(1 - datarow[0]['all_3544']);
 
@@ -183,6 +192,24 @@
 
                     });
 
+                    activeRegion.on("click", function (event) {
+                        let location = d3.pointer(event);
+
+                        let x = location[0];
+                        let xDate = yearScale.invert(x);
+
+                        let index = findYear(years, xDate);
+                        let highlightedYear = years[index];
+
+                        clickedMarker.attr("visibility", "visible");
+                        clickedMarker.attr("x1", yearScale(highlightedYear) + margins.left)
+                            .attr("x2", yearScale(highlightedYear) + margins.left)
+                            .attr("y1", 20)
+                            .attr("y2", lineHeight + margins.top + 10)
+                            .attr("stroke", "black")
+                            .attr("stroke-width", 2);
+                    })
+
 
                     linesvg.selectAll("circle.all2534").data(data)
                         .join("circle")
@@ -191,7 +218,17 @@
                         .attr("r", 5)
                         .attr("fill", "blue")
                         .on("mouseover", mouseOn)
-                        .on("mouseout", mouseOut);
+                        .on("mouseout", mouseOut)
+                        .on("click", function (event, d) {
+                            clickedMarker.attr("visibility", "visible");
+                            clickedMarker
+                                .attr("x1", yearScale(d['year']) + margins.left)
+                                .attr("x2", yearScale(d['year']) + margins.left)
+                                .attr("y1", 20)
+                                .attr("y2", lineHeight + margins.top + 10)
+                                .attr("stroke", "black")
+                                .attr("stroke-width", 2);
+                        });
 
                     linesvg.selectAll("circle.all3544").data(data)
                         .join("circle")
@@ -200,7 +237,17 @@
                         .attr("r", 5)
                         .attr("fill", "blue")
                         .on("mouseover", mouseOn)
-                        .on("mouseout", mouseOut);
+                        .on("mouseout", mouseOut)
+                        .on("click", function (event, d) {
+                            clickedMarker.attr("visibility", "visible");
+                            clickedMarker
+                                .attr("x1", yearScale(d['year']) + margins.left)
+                                .attr("x2", yearScale(d['year']) + margins.left)
+                                .attr("y1", 20)
+                                .attr("y2", lineHeight + margins.top + 10)
+                                .attr("stroke", "black")
+                                .attr("stroke-width", 2);
+                        });
 
                     let leftAxis = d3.axisLeft(marriageScale)
                         .tickFormat(d3.format('.0%'))
@@ -224,6 +271,8 @@
                         xMarker.attr("visibility", "visible");
                         yearMarker.attr("visibility", "visible");
 
+                        all2534Marker.attr("visibility", "visible");
+                        all3544Marker.attr("visibility", "visible");
                     }
 
                     function mouseOut(event, d) {
