@@ -14,14 +14,10 @@
 
         .line {
             fill: none;
-            stroke: steelblue;
             stroke-width: 2;
         }
 
         .dot {
-            fill: steelblue;
-            /* Fills the circles with the same color as the line */
-            stroke: steelblue;
             stroke-width: 2;
         }
     </style>
@@ -29,6 +25,34 @@
 
 <body>
     <svg id="linesvg" height="500" width="800" style="border:1px solid rgb(0, 0, 0)"></svg>
+
+    <form id="checkboxForm">
+        <label for="HS">
+            <input type="checkbox" id="HS" value="HS">
+            High school graduates or less
+        </label><br>
+        <label for="SC">
+            <input type="checkbox" id="SC" value="SC">
+            Some college
+        </label><br>
+        <label for="BAp">
+            <input type="checkbox" id="BAp" value="BAp">
+            Bachelor's degree or more
+        </label><br>
+        <label for="White">
+            <input type="checkbox" id="White" value="White">
+            Non-Hispanic white
+        </label><br>
+        <label for="Black">
+            <input type="checkbox" id="Black" value="Black">
+            Black or African American
+        </label><br>
+        <label for="Hisp">
+            <input type="checkbox" id="Hisp" value="Hisp">
+            Hispanic
+        </label><br>
+
+    </form>
 
     <script>
         const linesvg = d3.select("svg#linesvg");
@@ -46,7 +70,7 @@
                     const yearScale = d3.scaleLinear().domain(yearExtent).range([0, lineWidth])
 
                     const marriageExtent = d3.extent(data, d => (1 - d['all_2534']));
-                    const marriageScale = d3.scaleLinear().domain([marriageExtent[0] - 0.05, marriageExtent[1] + 0.1]).range([lineHeight, 0])
+                    const marriageScale = d3.scaleLinear().domain([marriageExtent[0] - 0.2, marriageExtent[1] + 0.1]).range([lineHeight, 0])
 
                     // Draw gridlines first
                     let leftGridlines = d3.axisLeft(marriageScale)
@@ -73,6 +97,7 @@
                         .datum(data)
                         .attr("class", "line")
                         .attr("d", line25)
+                        .attr("stroke", "blue")
                         .attr('transform', `translate(${margins.left},${margins.top})`);
 
                     const line35 = d3.line()
@@ -83,6 +108,7 @@
                     linesvg.append("path")
                         .datum(data)
                         .attr("class", "line")
+                        .attr("stroke", "blue")
                         .attr("d", line35)
                         .attr('transform', `translate(${margins.left},${margins.top})`);
 
@@ -122,6 +148,35 @@
                         .attr("r", 7)
                         .attr("visibility", "hidden");
 
+                    function markerFunctor(id) {
+                        return mouseGroup.append("circle")
+                            .attr("id", id)
+                            .attr("fill", "none")
+                            .attr("stroke", "black")
+                            .attr("stroke-width", 2)
+                            .attr("r", 7)
+                            .attr("visibility", "hidden"); // need to set to hidden later
+                    }
+
+                    let HS_2534Marker = markerFunctor('HS_2534Marker')
+                    let HS_3544Marker = markerFunctor('HS_3544Marker')
+
+                    let SC_2534Marker = markerFunctor('SC_2534Marker')
+                    let SC_3544Marker = markerFunctor('SC_3544Marker')
+
+                    let BAp_2534Marker = markerFunctor('BAp_2534Marker')
+                    let BAp_3544Marker = markerFunctor('BAp_3544Marker')
+
+                    let White_2534Marker = markerFunctor('White_2534Marker')
+                    let White_3544Marker = markerFunctor('White_3544Marker')
+
+                    let Black_2534Marker = markerFunctor('Black_2534Marker')
+                    let Black_3544Marker = markerFunctor('Black_3544Marker')
+
+                    let Hisp_2534Marker = markerFunctor('Hisp_2534Marker')
+                    let Hisp_3544Marker = markerFunctor('Hisp_3544Marker')
+
+
                     let clickedMarker = linesvg.append("line")
                         .attr("id", "clickedMarker")
                         .attr("fill", "none")
@@ -143,6 +198,16 @@
                         yearMarker.attr("visibility", "visible");
                         all2534Marker.attr("visibility", "visible");
                         all3544Marker.attr("visibility", "visible");
+
+                        let checked = getCheckedCheckboxes()
+                        //want marker to become visible
+
+                        for (i = 0; i < checked.length; i++) {
+                            let value2534Marker = d3.select("#" + checked[i] + '_2534Marker');
+                            let value3544Marker = d3.select("#" + checked[i] + '_3544Marker');
+                            value2534Marker.attr("visibility", "visible");
+                            value3544Marker.attr("visibility", "visible");
+                        }
                     });
 
                     activeRegion.on("mouseout", function () {
@@ -150,6 +215,17 @@
                         yearMarker.attr("visibility", "hidden");
                         all2534Marker.attr("visibility", "hidden");
                         all3544Marker.attr("visibility", "hidden");
+
+                        let checked = getCheckedCheckboxes()
+                        //want marker to become visible
+
+                        for (i = 0; i < checked.length; i++) {
+                            let value2534Marker = d3.select("#" + checked[i] + '_2534Marker');
+                            let value3544Marker = d3.select("#" + checked[i] + '_3544Marker');
+                            value2534Marker.attr("visibility", "hidden");
+                            value3544Marker.attr("visibility", "hidden");
+                        }
+
                     });
 
                     mouseGroup.attr('transform', `translate(${margins.left},${10})`);
@@ -161,6 +237,16 @@
                         years.push(year);
                     })
                     // console.log(years)
+
+                    function getCheckedCheckboxes() {
+                        const checkedCheckboxes = [];
+                        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                            if (checkbox.checked) {
+                                checkedCheckboxes.push(checkbox.value);
+                            }
+                        });
+                        return checkedCheckboxes;
+                    }
 
                     activeRegion.on("mousemove", function (event) {
                         let location = d3.pointer(event);
@@ -189,6 +275,18 @@
                         all2534Marker.attr("cx", xPos).attr("cy", yPos + 10);
                         all3544Marker.attr("cx", xPos).attr("cy", yPos2 + 10);
 
+                        // make loop for setting up the rest of the markers
+                        const checkedList = getCheckedCheckboxes();
+                        checkedList.forEach(value => {
+                            const markername2534 = value + '_2534Marker';
+                            const markername3544 = value + '_3544Marker';
+                            d3.select("#" + markername2534)
+                                .attr("cx", xPos)
+                                .attr("cy", marriageScale(1 - datarow[0][value + '_2534']) + 10);
+                            d3.select("#" + markername3544)
+                                .attr("cx", xPos)
+                                .attr("cy", marriageScale(1 - datarow[0][value + '_3544']) + 10);
+                        });
 
                     });
 
@@ -211,7 +309,7 @@
                     })
 
 
-                    linesvg.selectAll("circle.all2534").data(data)
+                    linesvg.selectAll("circle.all_2534").data(data)
                         .join("circle")
                         .attr("cx", d => yearScale(d['year']) + margins.left)
                         .attr("cy", d => marriageScale(1 - d['all_2534']) + margins.top)
@@ -230,7 +328,7 @@
                                 .attr("stroke-width", 2);
                         });
 
-                    linesvg.selectAll("circle.all3544").data(data)
+                    linesvg.selectAll("circle.all_3544").data(data)
                         .join("circle")
                         .attr("cx", d => yearScale(d['year']) + margins.left)
                         .attr("cy", d => marriageScale(1 - d['all_3544']) + margins.top)
@@ -248,6 +346,152 @@
                                 .attr("stroke", "black")
                                 .attr("stroke-width", 2);
                         });
+
+                    function lineFunctor(dataName, data, color, line) {
+                        linesvg.selectAll("circle." + dataName).data(data)
+                            .join("circle")
+                            .attr("class", "circle" + dataName)
+                            .attr("cx", d => yearScale(d['year']) + margins.left)
+                            .attr("cy", d => marriageScale(1 - d[dataName]) + margins.top)
+                            .attr("r", 5)
+                            .attr("fill", color)
+                            .attr("visibility", "hidden")
+                            .on("mouseover", mouseOn)
+                            .on("mouseout", mouseOut)
+                            .on("click", function (event, d) {
+                                clickedMarker.attr("visibility", "visible");
+                                clickedMarker
+                                    .attr("x1", yearScale(d['year']) + margins.left)
+                                    .attr("x2", yearScale(d['year']) + margins.left)
+                                    .attr("y1", 20)
+                                    .attr("y2", lineHeight + margins.top + 10)
+                                    .attr("stroke", "black")
+                                    .attr("stroke-width", 2);
+                            });
+
+                        linesvg.append("path")
+                            .datum(data)
+                            .attr("class", "line" + dataName)
+                            .attr("d", line)
+                            .attr("fill", "none")
+                            .attr("stroke", color)
+                            .attr("stroke-width", 2)
+                            .attr('transform', `translate(${margins.left},${margins.top})`)
+                            .attr("visibility", "hidden");
+                    }
+
+                    const lineHS_2534 = d3.line()
+                        .x(d => yearScale(d['year']))
+                        .y(d => marriageScale(1 - d['HS_2534']))
+                        .curve(d3.curveMonotoneX);
+                    lineFunctor('HS_2534', data, 'green', lineHS_2534);
+
+                    const lineHS_3544 = d3.line()
+                        .x(d => yearScale(d['year']))
+                        .y(d => marriageScale(1 - d['HS_3544']))
+                        .curve(d3.curveMonotoneX);
+                    lineFunctor('HS_3544', data, 'green', lineHS_3544);
+
+                    const lineSC_2534 = d3.line()
+                        .x(d => yearScale(d['year']))
+                        .y(d => marriageScale(1 - d['SC_2534']))
+                        .curve(d3.curveMonotoneX);
+                    lineFunctor('SC_2534', data, 'orange', lineSC_2534);
+
+                    const lineSC_3544 = d3.line()
+                        .x(d => yearScale(d['year']))
+                        .y(d => marriageScale(1 - d['SC_3544']))
+                        .curve(d3.curveMonotoneX);
+                    lineFunctor('SC_3544', data, 'orange', lineSC_3544);
+
+                    const lineBAp_2534 = d3.line()
+                        .x(d => yearScale(d['year']))
+                        .y(d => marriageScale(1 - d['BAp_2534']))
+                        .curve(d3.curveMonotoneX);
+                    lineFunctor('BAp_2534', data, 'purple', lineBAp_2534);
+
+                    const lineBAp_3544 = d3.line()
+                        .x(d => yearScale(d['year']))
+                        .y(d => marriageScale(1 - d['BAp_3544']))
+                        .curve(d3.curveMonotoneX);
+                    lineFunctor('BAp_3544', data, 'purple', lineBAp_3544);
+
+                    const lineWhite_2534 = d3.line()
+                        .x(d => yearScale(d['year']))
+                        .y(d => marriageScale(1 - d['White_2534']))
+                        .curve(d3.curveMonotoneX);
+                    lineFunctor('White_2534', data, 'pink', lineWhite_2534);
+
+                    const lineWhite_3544 = d3.line()
+                        .x(d => yearScale(d['year']))
+                        .y(d => marriageScale(1 - d['White_3544']))
+                        .curve(d3.curveMonotoneX);
+                    lineFunctor('White_3544', data, 'pink', lineWhite_3544);
+
+                    const lineBlack_2534 = d3.line()
+                        .x(d => yearScale(d['year']))
+                        .y(d => marriageScale(1 - d['Black_2534']))
+                        .curve(d3.curveMonotoneX);
+                    lineFunctor('Black_2534', data, 'brown', lineBlack_2534);
+
+                    const lineBlack_3544 = d3.line()
+                        .x(d => yearScale(d['year']))
+                        .y(d => marriageScale(1 - d['Black_3544']))
+                        .curve(d3.curveMonotoneX);
+                    lineFunctor('Black_3544', data, 'brown', lineBlack_3544);
+
+                    const lineHisp_2534 = d3.line()
+                        .x(d => yearScale(d['year']))
+                        .y(d => marriageScale(1 - d['Hisp_2534']))
+                        .curve(d3.curveMonotoneX);
+                    lineFunctor('Hisp_2534', data, 'orange', lineHisp_2534);
+
+                    const lineHisp_3544 = d3.line()
+                        .x(d => yearScale(d['year']))
+                        .y(d => marriageScale(1 - d['Hisp_3544']))
+                        .curve(d3.curveMonotoneX);
+                    lineFunctor('Hisp_3544', data, 'orange', lineHisp_3544);
+
+
+                    function becomeVisible(value) {
+                        const value2534 = value + '_2534';
+                        const value3544 = value + '_3544';
+
+                        linesvg.selectAll(".circle" + value2534).attr("visibility", "visible");
+                        linesvg.selectAll("path.line" + value2534).attr("visibility", "visible");
+
+                        linesvg.selectAll(".circle" + value3544).attr("visibility", "visible");
+                        linesvg.selectAll("path.line" + value3544).attr("visibility", "visible");
+                    }
+
+                    function becomeInvisible(value) {
+                        const value2534 = value + '_2534';
+                        const value3544 = value + '_3544';
+
+                        linesvg.selectAll(".circle" + value2534).attr("visibility", "hidden");
+                        linesvg.selectAll("path.line" + value2534).attr("visibility", "hidden");
+
+                        linesvg.selectAll(".circle" + value3544).attr("visibility", "hidden");
+                        linesvg.selectAll("path.line" + value3544).attr("visibility", "hidden");
+
+                        //want marker to become invisible
+                        let value2534Marker = d3.select("#" + value + '_2534Marker');
+                        let value3544Marker = d3.select("#" + value + '_3544Marker');
+                        value2534Marker.attr("visibility", "hidden");
+                        value3544Marker.attr("visibility", "hidden");
+                    }
+
+                    document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                        checkbox.addEventListener('change', function () {
+                            if (this.checked) {
+                                // console.log(this.value)
+                                becomeVisible(this.value)
+                            } else {
+                                // console.log(`Checkbox ${this.value} is unchecked`)
+                                becomeInvisible(this.value)
+                            }
+                        });
+                    });
 
                     let leftAxis = d3.axisLeft(marriageScale)
                         .tickFormat(d3.format('.0%'))
@@ -273,6 +517,17 @@
 
                         all2534Marker.attr("visibility", "visible");
                         all3544Marker.attr("visibility", "visible");
+
+                        let checked = getCheckedCheckboxes()
+                        //want marker to become visible
+
+                        for (i = 0; i < checked.length; i++) {
+                            let value2534Marker = d3.select("#" + checked[i] + '_2534Marker');
+                            let value3544Marker = d3.select("#" + checked[i] + '_3544Marker');
+                            value2534Marker.attr("visibility", "visible");
+                            value3544Marker.attr("visibility", "visible");
+                        }
+
                     }
 
                     function mouseOut(event, d) {
