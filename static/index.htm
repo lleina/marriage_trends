@@ -4,6 +4,97 @@
     <!---Imports d3--->
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto auto;
+            gap: 20px;
+            justify-content: center;
+            align-items: start;
+            width: 90%;
+            max-width: 1024px; /* Adjust based on your preference */
+            margin: 0 auto;
+        }
+
+        #checkboxForm {
+            grid-column: 1 / 2;
+            grid-row: 2 / 3;
+        }
+
+        #legend {
+            grid-column: 2 / 3;
+            grid-row: 2 / 3;
+        }
+
+        svg {
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        input[type="checkbox"] {
+            margin-right: 10px;
+        }
+
+        label {
+            display: block;
+            margin: 5px;
+            cursor: pointer;
+        }
+
+        #checkboxForm {
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #fafafa;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .legend {
+            font-size: 0.9em;
+        }
+
+        .legend rect {
+            stroke: #fff;
+            stroke-width: 2px;
+        }
+
+        .legend text {
+            font-size: 0.8em;
+        }
+
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: #000;
+            shape-rendering: crispEdges;
+        }
+
+        .axis text {
+            font-size: 0.8em;
+        }
+
+        .line {
+            stroke: steelblue;
+            stroke-width: 2px;
+        }
+
+        .dot {
+            fill: steelblue;
+        }
+
         .gridlines line {
             stroke: #bbb;
         }
@@ -24,36 +115,40 @@
 </head>
 
 <body>
-    <svg id="linesvg" height="500" width="800" style="border:1px solid rgb(0, 0, 0)"></svg>
-    <svg id="bargraph" height="200" width="800" style="border:1px solid rgb(0, 0, 0);"></svg>
+    <div class="container">
+        <svg id="linesvg" height="500" width="800" style="border:1px solid rgb(0, 0, 0)"></svg>
+        <svg id="bargraph" height="500" width="800" style="border:1px solid rgb(0, 0, 0);"></svg>
+        <form id="checkboxForm">
+            <label for="HS">
+                <input type="checkbox" id="HS" value="HS">
+                High school graduates or less
+            </label><br>
+            <label for="SC">
+                <input type="checkbox" id="SC" value="SC">
+                Some college
+            </label><br>
+            <label for="BAp">
+                <input type="checkbox" id="BAp" value="BAp">
+                Bachelor's degree or more
+            </label><br>
+            <label for="White">
+                <input type="checkbox" id="White" value="White">
+                Non-Hispanic white
+            </label><br>
+            <label for="Black">
+                <input type="checkbox" id="Black" value="Black">
+                Black or African American
+            </label><br>
+            <label for="Hisp">
+                <input type="checkbox" id="Hisp" value="Hisp">
+                Hispanic
+            </label><br>
+        </form>
+        <svg id="legend" width="800" height="100" style="border:1px solid rgb(0, 0, 0);"></svg>
+    </div>
 
-    <form id="checkboxForm">
-        <label for="HS">
-            <input type="checkbox" id="HS" value="HS">
-            High school graduates or less
-        </label><br>
-        <label for="SC">
-            <input type="checkbox" id="SC" value="SC">
-            Some college
-        </label><br>
-        <label for="BAp">
-            <input type="checkbox" id="BAp" value="BAp">
-            Bachelor's degree or more
-        </label><br>
-        <label for="White">
-            <input type="checkbox" id="White" value="White">
-            Non-Hispanic white
-        </label><br>
-        <label for="Black">
-            <input type="checkbox" id="Black" value="Black">
-            Black or African American
-        </label><br>
-        <label for="Hisp">
-            <input type="checkbox" id="Hisp" value="Hisp">
-            Hispanic
-        </label><br>
 
-    </form>
+
 
     <script>
         const linesvg = d3.select("svg#linesvg");
@@ -521,67 +616,106 @@
                     }
 
                     function updateBarGraph(selectedYears, data) {
-                        const svg = d3.select("#bargraph");
-                        const margin = {top: 20, right: 20, bottom: 30, left: 40};
-                        const width = +svg.attr("width") - margin.left - margin.right;
-                        const height = +svg.attr("height") - margin.top - margin.bottom;
+                            const benchmarkCategories = ["all_2534", "all_3544"];
+                            const svg = d3.select("#bargraph");
+                            const margin = { top: 20, right: 20, bottom: 30, left: 40 };
+                            const width = +svg.attr("width") - margin.left - margin.right;
+                            const height = +svg.attr("height") - margin.top - margin.bottom;
 
-                        // Clear previous bar chart
-                        svg.selectAll("*").remove();
+                            // Clear previous content
+                            svg.selectAll("*").remove();
 
-                        // Filter data for the selected years
-                        const filteredData = data.filter(d => selectedYears.includes(d.year));
+                            // Get the selected categories from checkboxes
+                            const checkedCategories = getCheckedCheckboxes(); // This function needs to exist and return the ids of checked checkboxes
 
-                        // Map the filtered data to the needed format for the bar chart
-                        let barChartData = [];
-                        filteredData.forEach(row => {
-                            Object.keys(row).forEach(key => {
-                                if (key.includes("_2534") || key.includes("_3544")) { // Adjust based on your data structure
-                                    barChartData.push({category: key, value: 1 - row[key], year: row.year});
-                                }
+                            // Filter data for the selected years
+                            const filteredData = data.filter(d => selectedYears.includes(d.year));
+                            let barChartData = [];
+
+                            // Always include benchmark data
+                            filteredData.forEach(row => {
+                                benchmarkCategories.forEach(category => {
+                                    barChartData.push({ category, value: 1 - row[category], year: row.year });
+                                });
                             });
-                        });
 
-                        // Set the scales
-                        const x0 = d3.scaleBand().rangeRound([0, width]).paddingInner(0.1);
-                        const x1 = d3.scaleBand().padding(0.05);
-                        const y = d3.scaleLinear().rangeRound([height, 0]);
-                        const z = d3.scaleOrdinal().range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]); // Color scale
+                            // Add additional data based on checkbox selections
+                            filteredData.forEach(row => {
+                                checkedCategories.forEach(key => {
+                                    if (key !== "all") { // Assuming "all" prefix is for benchmarks, adjust as necessary
+                                        const category = key + "_2534"; // Assuming your categories are suffixed with _2534 or _3544
+                                        const category2 = key + "_3544"; 
+                                        barChartData.push({ category, value: 1 - row[category], year: row.year });
+                                        barChartData.push({ category: category2, value: 1 - row[category2], year: row.year });
+                                    }
+                                });
+                            });
 
-                        const categories = [...new Set(barChartData.map(d => d.category))];
-                        const years = selectedYears;
-                        x0.domain(years);
-                        x1.domain(categories).rangeRound([0, x0.bandwidth()]);
-                        y.domain([0, d3.max(barChartData, d => d.value)]).nice();
+                            // Color scale
+                            const colorScale = d3.scaleOrdinal()
+                                .domain(benchmarkCategories.concat(checkedCategories.flatMap(key => [`${key}_2534`, `${key}_3544`])))
+                                .range(["#6b486b", "#a05d56", ...d3.schemeTableau10]);
 
-                        // Add the X Axis
-                        svg.append("g")
-                        .attr("class", "axis")
-                        .attr("transform", `translate(${margin.left},${height + margin.top})`)
-                        .call(d3.axisBottom(x0));
+                            const x = d3.scaleBand().rangeRound([0, width]).padding(0.1);
+                            const y = d3.scaleLinear().rangeRound([height, 0]);
 
-                        // Add the Y Axis
-                        svg.append("g")
-                        .attr("class", "axis")
-                        .attr("transform", `translate(${margin.left},${margin.top})`)
-                        .call(d3.axisLeft(y).ticks(null, "s"));
+                            x.domain(barChartData.map(d => `${d.year}_${d.category}`));
+                            y.domain([0, d3.max(barChartData, d => d.value)]).nice();
 
-                        // Add the bars
-                        const barGroups = svg.selectAll(".barGroup")
-                                            .data(barChartData)
-                                            .enter().append("g")
-                                            .attr("transform", d => `translate(${x0(d.year) + margin.left},${margin.top})`);
-
-                        barGroups.selectAll("rect")
-                                .data(d => [d])
+                            svg.selectAll(".bar")
+                                .data(barChartData)
                                 .enter().append("rect")
-                                .attr("x", d => x1(d.category))
+                                .attr("class", "bar")
+                                .attr("x", d => x(`${d.year}_${d.category}`))
                                 .attr("y", d => y(d.value))
-                                .attr("width", x1.bandwidth())
+                                .attr("width", x.bandwidth())
                                 .attr("height", d => height - y(d.value))
-                                .attr("fill", d => z(d.category));
+                                .attr("fill", d => colorScale(d.category));
 
-                        // Optionally add labels or legends here
+                            svg.selectAll(".label")
+                                .data(barChartData)
+                                .enter().append("text")
+                                .attr("class", "label")
+                                .attr("x", d => x(`${d.year}_${d.category}`) + x.bandwidth() / 2)
+                                .attr("y", d => y(d.value) - 5)
+                                .attr("text-anchor", "middle")
+                                .text(d => d3.format(".1%")(d.value));
+
+                            svg.append("g")
+                                .attr("transform", `translate(0,${height})`)
+                                .call(d3.axisBottom(x).tickFormat(d => {
+                                    let [year, category] = d.split("_");
+                                    return `${year} (${category})`;
+                                }).ticks(barChartData.length));
+
+                            svg.append("g")
+                                .call(d3.axisLeft(y).ticks(null, "%"));
+
+                            const legendSvg = d3.select("#legend");
+                            legendSvg.selectAll("*").remove(); // Clear previous legends
+
+                            const legendData = [...new Set(barChartData.map(d => d.category))];
+                            
+                            // Assuming each legend item needs 20px of height:
+                            legendSvg.attr("height", legendData.length * 20 + 10); // Adjust height based on items
+
+                            const legend = legendSvg.selectAll(".legend")
+                                .data(legendData)
+                                .enter().append("g")
+                                .attr("class", "legend")
+                                .attr("transform", (d, i) => `translate(10,${i * 20})`); // Adjust translation as needed
+
+                            legend.append("rect")
+                                .attr("x", 0)
+                                .attr("width", 18)
+                                .attr("height", 18)
+                                .attr("fill", d => colorScale(d)); // Ensure colorScale is accessible here
+
+                            legend.append("text")
+                                .attr("x", 24) // Position text to the right of the rectangles
+                                .attr("y", 9)
+                                .attr("dy", ".35em")
+                                .text(d => `${d.split('_').slice(0, -1).join(' ')} (${d.split('_').pop() === '2534' ? '25-34' : '35-44'})`);
                     }
 
 
