@@ -106,7 +106,6 @@
         }
 
         .line {
-            stroke: steelblue;
             stroke-width: 2px;
         }
 
@@ -257,29 +256,6 @@
                         .attr('transform', `translate(${margins.left},${lineHeight + margins.top + 10})`)
                         .call(bottomGridlines);
 
-                    const line25 = d3.line()
-                        .x(d => yearScale(d['year']))
-                        .y(d => marriageScale(1 - d['all_2534']))
-                        .curve(d3.curveMonotoneX); // This makes the line smoother
-
-                    linesvg.append("path")
-                        .datum(data)
-                        .attr("class", "line")
-                        .attr("d", line25)
-                        .attr("stroke", "blue")
-                        .attr('transform', `translate(${margins.left},${margins.top})`);
-
-                    const line35 = d3.line()
-                        .x(d => yearScale(d['year']))
-                        .y(d => marriageScale(1 - d['all_3544']))
-                        .curve(d3.curveMonotoneX);
-
-                    linesvg.append("path")
-                        .datum(data)
-                        .attr("class", "line")
-                        .attr("stroke", "blue")
-                        .attr("d", line35)
-                        .attr('transform', `translate(${margins.left},${margins.top})`);
 
                     let mouseGroup = linesvg.append("g");
 
@@ -322,9 +298,10 @@
                             .attr("id", id)
                             .attr("fill", "none")
                             .attr("stroke", "black")
+                            .attr("opacity", 1)
                             .attr("stroke-width", 2)
                             .attr("r", 7)
-                            .attr("visibility", "hidden"); // need to set to hidden later
+                            .attr("visibility", "hidden");
                     }
 
                     let HS_2534Marker = markerFunctor('HS_2534Marker')
@@ -374,7 +351,6 @@
                         yearMarker.attr("visibility", "hidden");
                         all2534Marker.attr("visibility", "hidden");
                         all3544Marker.attr("visibility", "hidden");
-
                         let checked = getCheckedCheckboxes()
                         //want marker to become visible
 
@@ -509,6 +485,7 @@
                         .attr("cy", d => marriageScale(1 - d['all_2534']) + margins.top)
                         .attr("r", 5)
                         .attr("fill", "blue")
+                        .attr("opacity", 0.5)
                         .on("mouseover", mouseOn)
                         .on("mouseout", mouseOut)
                         .on("click", function (event, d) {
@@ -520,6 +497,7 @@
                         .attr("cx", d => yearScale(d['year']) + margins.left)
                         .attr("cy", d => marriageScale(1 - d['all_3544']) + margins.top)
                         .attr("r", 5)
+                        .attr("opacity", 1)
                         .attr("fill", "blue")
                         .on("mouseover", mouseOn)
                         .on("mouseout", mouseOut)
@@ -527,30 +505,88 @@
                             updateMarkers(selectedYears);
                         });
 
-                    function lineFunctor(dataName, data, color, line) {
-                        linesvg.selectAll("circle." + dataName).data(data)
-                            .join("circle")
-                            .attr("class", "circle" + dataName)
-                            .attr("cx", d => yearScale(d['year']) + margins.left)
-                            .attr("cy", d => marriageScale(1 - d[dataName]) + margins.top)
-                            .attr("r", 5)
-                            .attr("fill", color)
-                            .attr("visibility", "hidden")
-                            .on("mouseover", mouseOn)
-                            .on("mouseout", mouseOut)
-                            .on("click", function (event, d) {
-                                updateMarkers(selectedYears);
-                            });
+                    const line25 = d3.line()
+                        .x(d => yearScale(d['year']))
+                        .y(d => marriageScale(1 - d['all_2534']))
+                        .curve(d3.curveMonotoneX);
 
-                        linesvg.append("path")
-                            .datum(data)
-                            .attr("class", "line" + dataName)
-                            .attr("d", line)
-                            .attr("fill", "none")
-                            .attr("stroke", color)
-                            .attr("stroke-width", 2)
-                            .attr('transform', `translate(${margins.left},${margins.top})`)
-                            .attr("visibility", "hidden");
+                    linesvg.append("path")
+                        .datum(data)
+                        .attr("class", "line")
+                        .attr("d", line25)
+                        .attr("opacity", 0.5)
+                        .attr("stroke", "blue")
+                        .attr('transform', `translate(${margins.left},${margins.top})`);
+
+                    const line35 = d3.line()
+                        .x(d => yearScale(d['year']))
+                        .y(d => marriageScale(1 - d['all_3544']))
+                        .curve(d3.curveMonotoneX);
+
+                    linesvg.append("path")
+                        .datum(data)
+                        .attr("class", "line")
+                        .attr("stroke", "blue")
+                        .attr("d", line35)
+                        .attr('transform', `translate(${margins.left},${margins.top})`)
+
+
+                    function lineFunctor(dataName, data, color, line) {
+                        if (dataName.indexOf("2534") !== -1) {
+                            linesvg.selectAll("circle." + dataName).data(data)
+                                .join("circle")
+                                .attr("class", "circle" + dataName)
+                                .attr("cx", d => yearScale(d['year']) + margins.left)
+                                .attr("cy", d => marriageScale(1 - d[dataName]) + margins.top)
+                                .attr("r", 5)
+                                .attr("opacity", 0.5)
+                                .attr("fill", color)
+                                .attr("visibility", "hidden")
+                                .on("mouseover", mouseOn)
+                                .on("mouseout", mouseOut)
+                                .on("click", function (event, d) {
+                                    updateMarkers(selectedYears);
+                                });
+
+                            linesvg.append("path")
+                                .datum(data)
+                                .attr("class", "line" + dataName)
+                                .attr("d", line)
+                                .attr("fill", "none")
+                                .attr("stroke", color)
+                                .attr("opacity", 0.5)
+                                .attr("stroke-width", 2)
+                                .attr('transform', `translate(${margins.left},${margins.top})`)
+                                .attr("visibility", "hidden");
+                        }
+                        else {
+                            linesvg.selectAll("circle." + dataName).data(data)
+                                .join("circle")
+                                .attr("class", "circle" + dataName)
+                                .attr("cx", d => yearScale(d['year']) + margins.left)
+                                .attr("cy", d => marriageScale(1 - d[dataName]) + margins.top)
+                                .attr("r", 5)
+                                .attr("opacity", 1)
+                                .attr("fill", color)
+                                .attr("visibility", "hidden")
+                                .on("mouseover", mouseOn)
+                                .on("mouseout", mouseOut)
+                                .on("click", function (event, d) {
+                                    updateMarkers(selectedYears);
+                                });
+
+                            linesvg.append("path")
+                                .datum(data)
+                                .attr("class", "line" + dataName)
+                                .attr("d", line)
+                                .attr("fill", "none")
+                                .attr("stroke", color)
+                                .attr("opacity", 1)
+                                .attr("stroke-width", 2)
+                                .attr('transform', `translate(${margins.left},${margins.top})`)
+                                .attr("visibility", "hidden");
+                        }
+
                     }
 
                     const lineHS_2534 = d3.line()
@@ -705,6 +741,7 @@
                             .attr("y", d => y(d.value) + 30)
                             .attr("width", x.bandwidth())
                             .attr("height", d => height - y(d.value) - 30)
+                            .attr("opacity", d => d.category.indexOf("2534") !== -1 ? 0.5 : 1)
                             .attr("fill", d => {
                                 if (!colorMapping[d.category]) {
                                     console.log("Undefined category for color mapping:", d.category);
@@ -742,25 +779,26 @@
                         const legendData = [...new Set(barChartData.map(d => d.category))];
 
                         // Assuming each legend item needs 20px of height:
-                        legendSvg.attr("height", legendData.length * 20 + 10); // Adjust height based on items
+                        legendSvg.attr("height", legendData.length * 20 + 10);
 
                         const legend = legendSvg.selectAll(".legend")
                             .data(legendData)
                             .enter().append("g")
                             .attr("class", "legend")
-                            .attr("transform", (d, i) => `translate(10, ${i * 20})`); // Adjust translation as needed
+                            .attr("transform", (d, i) => `translate(10, ${i * 20})`);
 
                         legend.append("rect")
                             .attr("x", 0)
                             .attr("width", 18)
                             .attr("height", 18)
+                            .attr("opacity", d => d.indexOf("2534") !== -1 ? 0.5 : 1)
                             .attr("fill", d => colorMapping[d]);
 
                         legend.append("text")
-                            .attr("x", 24) // Position text to the right of the rectangles
+                            .attr("x", 24)
                             .attr("y", 9)
                             .attr("dy", ".35em")
-                            .text(d => `${d.split('_').slice(0, -1).join(' ')} (${d.split('_').pop() === '2534' ? '25-34' : '35-44'})`);
+                            .text(d => `${d.split('_').slice(0, -1).join(' ')} (${d.split('_').pop() === '2534' ? '25-34 year olds' : '35-44 year olds'})`);
                     }
 
 
