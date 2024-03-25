@@ -276,16 +276,6 @@
                     let Hisp_2534Marker = markerFunctor('Hisp_2534Marker')
                     let Hisp_3544Marker = markerFunctor('Hisp_3544Marker')
 
-
-                    let clickedMarker = linesvg.append("line")
-                        .attr("id", "clickedMarker")
-                        .attr("fill", "none")
-                        .attr("stroke", "black")
-                        .attr("stroke-width", 2)
-                        .attr("y1", 10)
-                        .attr("y2", lineHeight + margins.top)
-                        .attr("visibility", "hidden");
-
                     let activeRegion = mouseGroup.append("rect")
                         .attr("id", "activeRegion")
                         .attr("width", lineWidth)
@@ -390,8 +380,6 @@
 
                     });
 
-
-                    // Assuming clickedMarker1 and clickedMarker2 are defined globally and initialized similarly to your existing clickedMarker
                     let clickedMarker1 = linesvg.append("line").attr("visibility", "hidden");
                     let clickedMarker2 = linesvg.append("line").attr("visibility", "hidden");
 
@@ -455,14 +443,7 @@
                         .on("mouseover", mouseOn)
                         .on("mouseout", mouseOut)
                         .on("click", function (event, d) {
-                            clickedMarker.attr("visibility", "visible");
-                            clickedMarker
-                                .attr("x1", yearScale(d['year']) + margins.left)
-                                .attr("x2", yearScale(d['year']) + margins.left)
-                                .attr("y1", 20)
-                                .attr("y2", lineHeight + margins.top + 10)
-                                .attr("stroke", "black")
-                                .attr("stroke-width", 2);
+                            updateMarkers(selectedYears);
                         });
 
                     linesvg.selectAll("circle.all_3544").data(data)
@@ -474,14 +455,7 @@
                         .on("mouseover", mouseOn)
                         .on("mouseout", mouseOut)
                         .on("click", function (event, d) {
-                            clickedMarker.attr("visibility", "visible");
-                            clickedMarker
-                                .attr("x1", yearScale(d['year']) + margins.left)
-                                .attr("x2", yearScale(d['year']) + margins.left)
-                                .attr("y1", 20)
-                                .attr("y2", lineHeight + margins.top + 10)
-                                .attr("stroke", "black")
-                                .attr("stroke-width", 2);
+                            updateMarkers(selectedYears);
                         });
 
                     function lineFunctor(dataName, data, color, line) {
@@ -496,14 +470,7 @@
                             .on("mouseover", mouseOn)
                             .on("mouseout", mouseOut)
                             .on("click", function (event, d) {
-                                clickedMarker.attr("visibility", "visible");
-                                clickedMarker
-                                    .attr("x1", yearScale(d['year']) + margins.left)
-                                    .attr("x2", yearScale(d['year']) + margins.left)
-                                    .attr("y1", 20)
-                                    .attr("y2", lineHeight + margins.top + 10)
-                                    .attr("stroke", "black")
-                                    .attr("stroke-width", 2);
+                                updateMarkers(selectedYears);
                             });
 
                         linesvg.append("path")
