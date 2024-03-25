@@ -625,28 +625,24 @@
                             const width = +svg.attr("width") - margin.left - margin.right;
                             const height = +svg.attr("height") - margin.top - margin.bottom ;
 
-                            // Clear previous content
+
                             svg.selectAll("*").remove();
 
-                            // Get the selected categories from checkboxes
-                            const checkedCategories = getCheckedCheckboxes(); // This function needs to exist and return the ids of checked checkboxes
+                            const checkedCategories = getCheckedCheckboxes(); 
 
-                            // Filter data for the selected years
                             const filteredData = data.filter(d => selectedYears.includes(d.year));
                             let barChartData = [];
 
-                            // Always include benchmark data
                             filteredData.forEach(row => {
                                 benchmarkCategories.forEach(category => {
                                     barChartData.push({ category, value: 1 - row[category], year: row.year });
                                 });
                             });
 
-                            // Add additional data based on checkbox selections
                             filteredData.forEach(row => {
                                 checkedCategories.forEach(key => {
-                                    if (key !== "all") { // Assuming "all" prefix is for benchmarks, adjust as necessary
-                                        const category = key + "_2534"; // Assuming your categories are suffixed with _2534 or _3544
+                                    if (key !== "all") { 
+                                        const category = key + "_2534"; 
                                         const category2 = key + "_3544"; 
                                         barChartData.push({ category, value: 1 - row[category], year: row.year });
                                         barChartData.push({ category: category2, value: 1 - row[category2], year: row.year });
@@ -670,9 +666,9 @@
                                 .enter().append("rect")
                                 .attr("class", "bar")
                                 .attr("x", d => x(`${d.year}_${d.category}`))
-                                .attr("y", d => y(d.value))
+                                .attr("y", d => y(d.value) + 30)
                                 .attr("width", x.bandwidth())
-                                .attr("height", d => height - y(d.value))
+                                .attr("height", d => height - y(d.value) - 30)
                                 .attr("fill", d => colorScale(d.category));
 
                             svg.selectAll(".label")
@@ -680,7 +676,7 @@
                                 .enter().append("text")
                                 .attr("class", "label")
                                 .attr("x", d => x(`${d.year}_${d.category}`) + x.bandwidth() / 2)
-                                .attr("y", d => y(d.value) - 5)
+                                .attr("y", d => y(d.value) + 25)
                                 .attr("text-anchor", "middle")
                                 .text(d => d3.format(".1%")(d.value));
 
