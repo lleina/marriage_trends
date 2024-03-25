@@ -13,48 +13,57 @@
         padding: 20px;
         background-color: #fff0f5; /* Light pink background */
     }
-        .container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            grid-template-rows: auto auto;
-            gap: 20px;
-            justify-content: center;
-            align-items: start;
-            width: 90%;
-            max-width: 1024px;
-            margin: 0 auto;
-        }
 
-        #checkboxForm {
-            grid-column: 1 / 2;
-            grid-row: 2 / 3;
-        }
+    .container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto auto;
+        gap: 20px;
+        justify-content: center;
+        align-items: start;
+        width: 90%;
+        max-width: 1024px;
+        margin: 0 auto;
+    }
 
-        #legend {
-            grid-column: 2 / 3;
-            grid-row: 2 / 3;
-        }
+    #checkboxForm, #legend {
+        border: 1px solid #ffccd5;
+        padding: 10px;
+        border-radius: 5px;
+        background-color: #ffe4e9; /* Very light pink background */
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-top: 20px;
+        /* width: calc(50% - 20px);  Adjust width to account for the grid gap */
+    }
 
-        svg {
+    svg {
             background-color: #fff;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        form {
-            margin-top: 20px;
-        }
+    input[type="checkbox"], .legend rect {
+        margin-right: 10px;
+    }
 
-        input[type="checkbox"] {
-            margin-right: 10px;
-        }
+    label, .legend-item {
+        display: flex;
+        align-items: center;
+        margin: 5px;
+        cursor: pointer;
+    }
 
-        label {
-            display: block;
-            margin: 5px;
-            cursor: pointer;
-        }
+    .axis path, .axis line {
+        fill: none;
+        stroke: #d26a8d; /* Pinkish lines for the axis */
+        shape-rendering: crispEdges;
+    }
 
-        #checkboxForm {
+    .axis text {
+        font-size: 0.9em;
+        color: #7e072f; /* Pinkish text color */
+    }
+        
+    #checkboxForm {
         border: 1px solid #ffccd5; /* Lighter pink border for the form */
         padding: 10px;
         border-radius: 5px;
@@ -62,16 +71,16 @@
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 
-        .legend {
-            font-size: 0.9em;
-        }
+    .legend {
+        font-size: 0.9em;
+    }
 
-        .legend rect {
-            stroke: #fff;
-            stroke-width: 2px;
-        }
+    .legend rect {
+        stroke: #ffccd5;
+        stroke-width: 2px;
+    }
 
-        .legend, .axis text {
+    .legend, .axis text {
         font-size: 0.9em;
         color: #7e072f; /* Pinkish text color */
     }
@@ -82,32 +91,33 @@
         shape-rendering: crispEdges;
     }
 
-        .line {
-            stroke: steelblue;
-            stroke-width: 2px;
-        }
+    .line {
+        stroke: steelblue;
+        stroke-width: 2px;
+    }
 
-        .dot {
-            fill: steelblue;
-        }
+    .dot {
+        fill: steelblue;
+    }
 
-        .gridlines line {
+    .gridlines line {
         stroke: #eee; /* Lighter gridlines for softer appearance */
     }
 
-        .gridlines .domain {
-            stroke: none;
-        }
+    .gridlines .domain {
+        stroke: none;
+    }
 
-        .line {
-            fill: none;
-            stroke-width: 2;
-        }
+    .line {
+        fill: none;
+        stroke-width: 2;
+    }
 
-        .dot {
-            stroke-width: 2;
-        }
-        .title {
+    .dot {
+        stroke-width: 2;
+    }
+
+    .title {
         font-size: 1.5em;
         font-weight: bold;
         color: #d26a8d;
@@ -120,7 +130,7 @@
     <div class="title">Marriage Trends Visualization</div>
     <div class="container">
         <svg id="linesvg" height="500" width="800" style="border:1px solid rgb(0, 0, 0)"></svg>
-        <svg id="bargraph" height="500" width="800" style="border:1px solid rgb(0, 0, 0);"></svg>
+        <svg id="bargraph" width="800" height="500" viewBox="-40 -90 800 620" style="border:1px solid rgb(0, 0, 0);"></svg>
         <form id="checkboxForm">
             <label for="HS">
                 <input type="checkbox" id="HS" value="HS">
@@ -161,6 +171,25 @@
         const lineWidth = width - margins.left - margins.right;
         const lineHeight = height - margins.top - margins.bottom;
         let selectedYears = []; //tracks up to two selected years
+
+        const colorMapping = {
+            'all_2534': 'blue', // Assign appropriate colors
+            'all_3544': 'blue',
+            'HS_2534': 'green',
+            'HS_3544': 'green',
+            'SC_2534': 'orange',
+            'SC_3544': 'orange',
+            'BAp_2534': 'purple',
+            'BAp_3544': 'purple',
+            'White_2534': 'pink',
+            'White_3544': 'pink',
+            'Black_2534': 'brown',
+            'Black_3544': 'brown',
+            'Hisp_2534': 'orange',
+            'Hisp_3544': 'orange'
+        };
+
+        const legendData = Object.keys(colorMapping);
 
         const requestData = async function () {
 
@@ -488,73 +517,73 @@
                         .x(d => yearScale(d['year']))
                         .y(d => marriageScale(1 - d['HS_2534']))
                         .curve(d3.curveMonotoneX);
-                    lineFunctor('HS_2534', data, 'green', lineHS_2534);
+                    lineFunctor('HS_2534', data, colorMapping['HS_2534'], lineHS_2534);
 
                     const lineHS_3544 = d3.line()
                         .x(d => yearScale(d['year']))
                         .y(d => marriageScale(1 - d['HS_3544']))
                         .curve(d3.curveMonotoneX);
-                    lineFunctor('HS_3544', data, 'green', lineHS_3544);
+                    lineFunctor('HS_3544', data, colorMapping['HS_3544'], lineHS_3544);
 
                     const lineSC_2534 = d3.line()
                         .x(d => yearScale(d['year']))
                         .y(d => marriageScale(1 - d['SC_2534']))
                         .curve(d3.curveMonotoneX);
-                    lineFunctor('SC_2534', data, 'orange', lineSC_2534);
+                    lineFunctor('SC_2534', data, colorMapping['SC_2534'], lineSC_2534);
 
                     const lineSC_3544 = d3.line()
                         .x(d => yearScale(d['year']))
                         .y(d => marriageScale(1 - d['SC_3544']))
                         .curve(d3.curveMonotoneX);
-                    lineFunctor('SC_3544', data, 'orange', lineSC_3544);
+                    lineFunctor('SC_3544', data, colorMapping['SC_3544'], lineSC_3544);
 
                     const lineBAp_2534 = d3.line()
                         .x(d => yearScale(d['year']))
                         .y(d => marriageScale(1 - d['BAp_2534']))
                         .curve(d3.curveMonotoneX);
-                    lineFunctor('BAp_2534', data, 'purple', lineBAp_2534);
+                    lineFunctor('BAp_2534', data, colorMapping['BAp_2534'], lineBAp_2534);
 
                     const lineBAp_3544 = d3.line()
                         .x(d => yearScale(d['year']))
                         .y(d => marriageScale(1 - d['BAp_3544']))
                         .curve(d3.curveMonotoneX);
-                    lineFunctor('BAp_3544', data, 'purple', lineBAp_3544);
+                    lineFunctor('BAp_3544', data, colorMapping['BAp_3544'], lineBAp_3544);
 
                     const lineWhite_2534 = d3.line()
                         .x(d => yearScale(d['year']))
                         .y(d => marriageScale(1 - d['White_2534']))
                         .curve(d3.curveMonotoneX);
-                    lineFunctor('White_2534', data, 'pink', lineWhite_2534);
+                    lineFunctor('White_2534', data, colorMapping['White_2534'], lineWhite_2534);
 
                     const lineWhite_3544 = d3.line()
                         .x(d => yearScale(d['year']))
                         .y(d => marriageScale(1 - d['White_3544']))
                         .curve(d3.curveMonotoneX);
-                    lineFunctor('White_3544', data, 'pink', lineWhite_3544);
+                    lineFunctor('White_3544', data, colorMapping['White_3544'], lineWhite_3544);
 
                     const lineBlack_2534 = d3.line()
                         .x(d => yearScale(d['year']))
                         .y(d => marriageScale(1 - d['Black_2534']))
                         .curve(d3.curveMonotoneX);
-                    lineFunctor('Black_2534', data, 'brown', lineBlack_2534);
+                    lineFunctor('Black_2534', data, colorMapping['Black_2534'], lineBlack_2534);
 
                     const lineBlack_3544 = d3.line()
                         .x(d => yearScale(d['year']))
                         .y(d => marriageScale(1 - d['Black_3544']))
                         .curve(d3.curveMonotoneX);
-                    lineFunctor('Black_3544', data, 'brown', lineBlack_3544);
+                    lineFunctor('Black_3544', data, colorMapping['Black_3544'], lineBlack_3544);
 
                     const lineHisp_2534 = d3.line()
                         .x(d => yearScale(d['year']))
                         .y(d => marriageScale(1 - d['Hisp_2534']))
                         .curve(d3.curveMonotoneX);
-                    lineFunctor('Hisp_2534', data, 'orange', lineHisp_2534);
+                    lineFunctor('Hisp_2534', data, colorMapping['Hisp_2534'], lineHisp_2534);
 
                     const lineHisp_3544 = d3.line()
                         .x(d => yearScale(d['year']))
                         .y(d => marriageScale(1 - d['Hisp_3544']))
                         .curve(d3.curveMonotoneX);
-                    lineFunctor('Hisp_3544', data, 'orange', lineHisp_3544);
+                    lineFunctor('Hisp_3544', data, colorMapping['Hisp_3544'], lineHisp_3544);
 
 
                     function becomeVisible(value) {
@@ -636,7 +665,12 @@
                                 .attr("y", d => y(d.value) + 30)
                                 .attr("width", x.bandwidth())
                                 .attr("height", d => height - y(d.value) - 30)
-                                .attr("fill", d => colorScale(d.category));
+                                .attr("fill", d => {
+                                    if (!colorMapping[d.category]) {
+                                        console.log("Undefined category for color mapping:", d.category);
+                                    }
+                                    return colorMapping[d.category];
+                                });
 
                             svg.selectAll(".label")
                                 .data(barChartData)
@@ -648,11 +682,16 @@
                                 .text(d => d3.format(".1%")(d.value));
 
                             svg.append("g")
-                                .attr("transform", `translate(0,${height})`)
-                                .call(d3.axisBottom(x).tickFormat(d => {
-                                    let [year, category] = d.split("_");
-                                    return `${year} (${category})`;
-                                }).ticks(barChartData.length));
+                            .attr("transform", `translate(0,${height})`)
+                            .call(d3.axisBottom(x).tickFormat(d => {
+                                let [year, category] = d.split("_");
+                                return `${year} (${category})`;
+                            }).ticks(barChartData.length))
+                            .selectAll("text") // Select all text elements for the X-axis
+                                .style("text-anchor", "end") // Position the anchor of the text at the end
+                                .attr("dx", "-.8em") // Adjust distance from the tick (horizontal)
+                                .attr("dy", ".15em") // Adjust distance from the tick (vertical)
+                                .attr("transform", "rotate(-65)"); // Rotate text; negative for clockwise
 
                             svg.append("g")
                                 .call(d3.axisLeft(y).ticks(null, "%"));
@@ -669,13 +708,13 @@
                                 .data(legendData)
                                 .enter().append("g")
                                 .attr("class", "legend")
-                                .attr("transform", (d, i) => `translate(10,${i * 20})`); // Adjust translation as needed
+                                .attr("transform", (d, i) => `translate(10, ${i * 20})`); // Adjust translation as needed
 
                             legend.append("rect")
                                 .attr("x", 0)
                                 .attr("width", 18)
                                 .attr("height", 18)
-                                .attr("fill", d => colorScale(d)); // Ensure colorScale is accessible here
+                                .attr("fill", d => colorMapping[d]);
 
                             legend.append("text")
                                 .attr("x", 24) // Position text to the right of the rectangles
