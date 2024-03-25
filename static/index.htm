@@ -5,132 +5,147 @@
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
         body {
-        font-family: 'Arial', sans-serif;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 20px;
-        padding: 20px;
-        background-color: #fff0f5; /* Light pink background */
-    }
-
-    .container {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: auto auto;
-        gap: 20px;
-        justify-content: center;
-        align-items: start;
-        width: 90%;
-        max-width: 1024px;
-        margin: 0 auto;
-    }
-
-    #checkboxForm, #legend {
-        border: 1px solid #ffccd5;
-        padding: 10px;
-        border-radius: 5px;
-        background-color: #ffe4e9; /* Very light pink background */
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        margin-top: 20px;
-        /* width: calc(50% - 20px);  Adjust width to account for the grid gap */
-    }
-
-    svg {
-            background-color: #fff;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            background-color: #fff0f5;
+            /* Light pink background */
         }
 
-    input[type="checkbox"], .legend rect {
-        margin-right: 10px;
-    }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto auto;
+            gap: 20px;
+            justify-content: center;
+            align-items: start;
+            width: 90%;
+            max-width: 1024px;
+            margin: 0 auto;
+        }
 
-    label, .legend-item {
-        display: flex;
-        align-items: center;
-        margin: 5px;
-        cursor: pointer;
-    }
+        #checkboxForm,
+        #legend {
+            border: 1px solid #ffccd5;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #ffe4e9;
+            /* Very light pink background */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            /* width: calc(50% - 20px);  Adjust width to account for the grid gap */
+        }
 
-    .axis path, .axis line {
-        fill: none;
-        stroke: #d26a8d; /* Pinkish lines for the axis */
-        shape-rendering: crispEdges;
-    }
+        svg {
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
 
-    .axis text {
-        font-size: 0.9em;
-        color: #7e072f; /* Pinkish text color */
-    }
-        
-    #checkboxForm {
-        border: 1px solid #ffccd5; /* Lighter pink border for the form */
-        padding: 10px;
-        border-radius: 5px;
-        background-color: #ffe4e9; /* Very light pink background for the form */
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
+        input[type="checkbox"],
+        .legend rect {
+            margin-right: 10px;
+        }
 
-    .legend {
-        font-size: 0.9em;
-    }
+        label,
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 5px;
+            cursor: pointer;
+        }
 
-    .legend rect {
-        stroke: #ffccd5;
-        stroke-width: 2px;
-    }
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: #d26a8d;
+            /* Pinkish lines for the axis */
+            shape-rendering: crispEdges;
+        }
 
-    .legend, .axis text {
-        font-size: 0.9em;
-        color: #7e072f; /* Pinkish text color */
-    }
+        .axis text {
+            font-size: 0.9em;
+            color: #7e072f;
+            /* Pinkish text color */
+        }
 
-    .axis path, .axis line {
-        fill: none;
-        stroke: #d26a8d; /* Pinkish lines for the axis */
-        shape-rendering: crispEdges;
-    }
+        #checkboxForm {
+            border: 1px solid #ffccd5;
+            /* Lighter pink border for the form */
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #ffe4e9;
+            /* Very light pink background for the form */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
 
-    .line {
-        stroke: steelblue;
-        stroke-width: 2px;
-    }
+        .legend {
+            font-size: 0.9em;
+        }
 
-    .dot {
-        fill: steelblue;
-    }
+        .legend rect {
+            stroke: #ffccd5;
+            stroke-width: 2px;
+        }
 
-    .gridlines line {
-        stroke: #eee; /* Lighter gridlines for softer appearance */
-    }
+        .legend,
+        .axis text {
+            font-size: 0.9em;
+            color: #7e072f;
+            /* Pinkish text color */
+        }
 
-    .gridlines .domain {
-        stroke: none;
-    }
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: #d26a8d;
+            /* Pinkish lines for the axis */
+            shape-rendering: crispEdges;
+        }
 
-    .line {
-        fill: none;
-        stroke-width: 2;
-    }
+        .line {
+            stroke: steelblue;
+            stroke-width: 2px;
+        }
 
-    .dot {
-        stroke-width: 2;
-    }
+        .dot {
+            fill: steelblue;
+        }
 
-    .title {
-        font-size: 1.5em;
-        font-weight: bold;
-        color: #d26a8d;
-        margin: 20px 0;
-    }
+        .gridlines line {
+            stroke: #eee;
+            /* Lighter gridlines for softer appearance */
+        }
+
+        .gridlines .domain {
+            stroke: none;
+        }
+
+        .line {
+            fill: none;
+            stroke-width: 2;
+        }
+
+        .dot {
+            stroke-width: 2;
+        }
+
+        .title {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #d26a8d;
+            margin: 20px 0;
+        }
     </style>
 </head>
 
 <body>
     <div class="title">Marriage Trends Visualization</div>
     <div class="container">
-        <svg id="linesvg" height="500" width="800" style="border:1px solid rgb(0, 0, 0)"></svg>
-        <svg id="bargraph" width="800" height="500" viewBox="-40 -90 800 620" style="border:1px solid rgb(0, 0, 0);"></svg>
+        <svg id="linesvg" height="500" width="800"></svg>
+        <svg id="bargraph" width="800" height="500" viewBox="-40 -90 800 620"></svg>
         <form id="checkboxForm">
             <label for="HS">
                 <input type="checkbox" id="HS" value="HS">
@@ -157,7 +172,7 @@
                 Hispanic
             </label><br>
         </form>
-        <svg id="legend" width="800" height="100" style="border:1px solid rgb(0, 0, 0);"></svg>
+        <svg id="legend" width="800" height="100"></svg>
     </div>
 
 
@@ -167,7 +182,7 @@
         const linesvg = d3.select("svg#linesvg");
         const width = linesvg.attr("width");
         const height = linesvg.attr("height");
-        const margins = { top: 20, right: 20, bottom: 50, left: 50 };
+        const margins = { top: 70, right: 20, bottom: 70, left: 80 };
         const lineWidth = width - margins.left - margins.right;
         const lineHeight = height - margins.top - margins.bottom;
         let selectedYears = []; //tracks up to two selected years
@@ -188,6 +203,31 @@
             'Hisp_2534': 'orange',
             'Hisp_3544': 'orange'
         };
+
+        linesvg.append("text")
+            .attr("class", "chart-title")
+            .attr("x", lineWidth / 2 + 40)
+            .attr("y", 30)
+            .attr("text-anchor", "middle")
+            .style("font-weight", "bold")
+            .style("font-size", "20px")
+            .style("fill", "black")
+            .text("Percentage of a Population Married in Each Year");
+
+        linesvg.append("text")
+            .attr("class", "y-axis-title")
+            .attr("transform", "rotate(-90)")
+            .attr("x", -lineHeight / 2 - 70)
+            .attr("y", 30)
+            .attr("text-anchor", "middle")
+            .text("Percentage of Population Married");
+
+        linesvg.append("text")
+            .attr("class", "x-axis-title")
+            .attr("x", lineWidth / 2 + 50)
+            .attr("y", lineHeight + 120)
+            .attr("text-anchor", "middle")
+            .text("Year");
 
         const legendData = Object.keys(colorMapping);
 
@@ -248,7 +288,7 @@
                         .attr("fill", "none")
                         .attr("stroke", "black")
                         .attr("stroke-width", 1)
-                        .attr("y1", 10)
+                        .attr("y1", margins.top - 10)
                         .attr("y2", lineHeight + margins.top)
                         .attr("visibility", "hidden");
 
@@ -258,7 +298,7 @@
                         .attr("stroke", "none")
                         .attr("stroke-width", 1)
                         .attr("style", "font-family: sans-serif;")
-                        .attr("y", 5)
+                        .attr("y", margins.top - 15)
                         .attr("visibility", "hidden");
 
                     let all2534Marker = mouseGroup.append("circle")
@@ -391,8 +431,8 @@
                         let yPos = marriageScale(1 - datarow[0]['all_2534']);
                         let yPos2 = marriageScale(1 - datarow[0]['all_3544']);
 
-                        all2534Marker.attr("cx", xPos).attr("cy", yPos + 10);
-                        all3544Marker.attr("cx", xPos).attr("cy", yPos2 + 10);
+                        all2534Marker.attr("cx", xPos).attr("cy", yPos + margins.top - 10);
+                        all3544Marker.attr("cx", xPos).attr("cy", yPos2 + margins.top - 10);
 
                         // make loop for setting up the rest of the markers
                         const checkedList = getCheckedCheckboxes();
@@ -401,10 +441,10 @@
                             const markername3544 = value + '_3544Marker';
                             d3.select("#" + markername2534)
                                 .attr("cx", xPos)
-                                .attr("cy", marriageScale(1 - datarow[0][value + '_2534']) + 10);
+                                .attr("cy", marriageScale(1 - datarow[0][value + '_2534']) + margins.top - 10);
                             d3.select("#" + markername3544)
                                 .attr("cx", xPos)
-                                .attr("cy", marriageScale(1 - datarow[0][value + '_3544']) + 10);
+                                .attr("cy", marriageScale(1 - datarow[0][value + '_3544']) + margins.top - 10);
                         });
 
                     });
@@ -412,7 +452,7 @@
                     let clickedMarker1 = linesvg.append("line").attr("visibility", "hidden");
                     let clickedMarker2 = linesvg.append("line").attr("visibility", "hidden");
 
-                    activeRegion.on("click", function(event) {
+                    activeRegion.on("click", function (event) {
                         let location = d3.pointer(event);
                         let x = location[0];
                         let xDate = yearScale.invert(x);
@@ -436,7 +476,7 @@
                         updateMarkers(selectedYears);
 
 
-                        if(data && selectedYears.length > 0) {
+                        if (data && selectedYears.length > 0) {
                             updateBarGraph(selectedYears, data); //dynamic update
                         } else {
                             //clear the bar graph if no years are selected
@@ -615,112 +655,112 @@
                     }
 
                     function updateBarGraph(selectedYears, data) {
-                            const benchmarkCategories = ["all_2534", "all_3544"];
-                            const svg = d3.select("#bargraph");
-                            const margin = { top: 20, right: 20, bottom: 30, left: 40 };
-                            const width = +svg.attr("width") - margin.left - margin.right;
-                            const height = +svg.attr("height") - margin.top - margin.bottom ;
+                        const benchmarkCategories = ["all_2534", "all_3544"];
+                        const svg = d3.select("#bargraph");
+                        const margin = { top: 20, right: 20, bottom: 30, left: 40 };
+                        const width = +svg.attr("width") - margin.left - margin.right;
+                        const height = +svg.attr("height") - margin.top - margin.bottom;
 
 
-                            svg.selectAll("*").remove();
+                        svg.selectAll("*").remove();
 
-                            const checkedCategories = getCheckedCheckboxes(); 
+                        const checkedCategories = getCheckedCheckboxes();
 
-                            const filteredData = data.filter(d => selectedYears.includes(d.year));
-                            let barChartData = [];
+                        const filteredData = data.filter(d => selectedYears.includes(d.year));
+                        let barChartData = [];
 
-                            filteredData.forEach(row => {
-                                benchmarkCategories.forEach(category => {
+                        filteredData.forEach(row => {
+                            benchmarkCategories.forEach(category => {
+                                barChartData.push({ category, value: 1 - row[category], year: row.year });
+                            });
+                        });
+
+                        filteredData.forEach(row => {
+                            checkedCategories.forEach(key => {
+                                if (key !== "all") {
+                                    const category = key + "_2534";
+                                    const category2 = key + "_3544";
                                     barChartData.push({ category, value: 1 - row[category], year: row.year });
-                                });
+                                    barChartData.push({ category: category2, value: 1 - row[category2], year: row.year });
+                                }
+                            });
+                        });
+
+                        // Color scale
+                        const colorScale = d3.scaleOrdinal()
+                            .domain(benchmarkCategories.concat(checkedCategories.flatMap(key => [`${key}_2534`, `${key}_3544`])))
+                            .range(["#6b486b", "#a05d56", ...d3.schemeTableau10]);
+
+                        const x = d3.scaleBand().rangeRound([0, width]).padding(0.1);
+                        const y = d3.scaleLinear().rangeRound([height, 0]);
+
+                        x.domain(barChartData.map(d => `${d.year}_${d.category}`));
+                        y.domain([0, d3.max(barChartData, d => d.value)]).nice();
+
+                        svg.selectAll(".bar")
+                            .data(barChartData)
+                            .enter().append("rect")
+                            .attr("class", "bar")
+                            .attr("x", d => x(`${d.year}_${d.category}`))
+                            .attr("y", d => y(d.value) + 30)
+                            .attr("width", x.bandwidth())
+                            .attr("height", d => height - y(d.value) - 30)
+                            .attr("fill", d => {
+                                if (!colorMapping[d.category]) {
+                                    console.log("Undefined category for color mapping:", d.category);
+                                }
+                                return colorMapping[d.category];
                             });
 
-                            filteredData.forEach(row => {
-                                checkedCategories.forEach(key => {
-                                    if (key !== "all") { 
-                                        const category = key + "_2534"; 
-                                        const category2 = key + "_3544"; 
-                                        barChartData.push({ category, value: 1 - row[category], year: row.year });
-                                        barChartData.push({ category: category2, value: 1 - row[category2], year: row.year });
-                                    }
-                                });
-                            });
+                        svg.selectAll(".label")
+                            .data(barChartData)
+                            .enter().append("text")
+                            .attr("class", "label")
+                            .attr("x", d => x(`${d.year}_${d.category}`) + x.bandwidth() / 2)
+                            .attr("y", d => y(d.value) + 25)
+                            .attr("text-anchor", "middle")
+                            .text(d => d3.format(".1%")(d.value));
 
-                            // Color scale
-                            const colorScale = d3.scaleOrdinal()
-                                .domain(benchmarkCategories.concat(checkedCategories.flatMap(key => [`${key}_2534`, `${key}_3544`])))
-                                .range(["#6b486b", "#a05d56", ...d3.schemeTableau10]);
-
-                            const x = d3.scaleBand().rangeRound([0, width]).padding(0.1);
-                            const y = d3.scaleLinear().rangeRound([height, 0]);
-
-                            x.domain(barChartData.map(d => `${d.year}_${d.category}`));
-                            y.domain([0, d3.max(barChartData, d => d.value)]).nice();
-
-                            svg.selectAll(".bar")
-                                .data(barChartData)
-                                .enter().append("rect")
-                                .attr("class", "bar")
-                                .attr("x", d => x(`${d.year}_${d.category}`))
-                                .attr("y", d => y(d.value) + 30)
-                                .attr("width", x.bandwidth())
-                                .attr("height", d => height - y(d.value) - 30)
-                                .attr("fill", d => {
-                                    if (!colorMapping[d.category]) {
-                                        console.log("Undefined category for color mapping:", d.category);
-                                    }
-                                    return colorMapping[d.category];
-                                });
-
-                            svg.selectAll(".label")
-                                .data(barChartData)
-                                .enter().append("text")
-                                .attr("class", "label")
-                                .attr("x", d => x(`${d.year}_${d.category}`) + x.bandwidth() / 2)
-                                .attr("y", d => y(d.value) + 25)
-                                .attr("text-anchor", "middle")
-                                .text(d => d3.format(".1%")(d.value));
-
-                            svg.append("g")
+                        svg.append("g")
                             .attr("transform", `translate(0,${height})`)
                             .call(d3.axisBottom(x).tickFormat(d => {
                                 let [year, category] = d.split("_");
                                 return `${year} (${category})`;
                             }).ticks(barChartData.length))
                             .selectAll("text") // Select all text elements for the X-axis
-                                .style("text-anchor", "end") // Position the anchor of the text at the end
-                                .attr("dx", "-.8em") // Adjust distance from the tick (horizontal)
-                                .attr("dy", ".15em") // Adjust distance from the tick (vertical)
-                                .attr("transform", "rotate(-65)"); // Rotate text; negative for clockwise
+                            .style("text-anchor", "end") // Position the anchor of the text at the end
+                            .attr("dx", "-.8em") // Adjust distance from the tick (horizontal)
+                            .attr("dy", ".15em") // Adjust distance from the tick (vertical)
+                            .attr("transform", "rotate(-65)"); // Rotate text; negative for clockwise
 
-                            svg.append("g")
-                                .call(d3.axisLeft(y).ticks(null, "%"));
+                        svg.append("g")
+                            .call(d3.axisLeft(y).ticks(null, "%"));
 
-                            const legendSvg = d3.select("#legend");
-                            legendSvg.selectAll("*").remove(); // Clear previous legends
+                        const legendSvg = d3.select("#legend");
+                        legendSvg.selectAll("*").remove(); // Clear previous legends
 
-                            const legendData = [...new Set(barChartData.map(d => d.category))];
-                            
-                            // Assuming each legend item needs 20px of height:
-                            legendSvg.attr("height", legendData.length * 20 + 10); // Adjust height based on items
+                        const legendData = [...new Set(barChartData.map(d => d.category))];
 
-                            const legend = legendSvg.selectAll(".legend")
-                                .data(legendData)
-                                .enter().append("g")
-                                .attr("class", "legend")
-                                .attr("transform", (d, i) => `translate(10, ${i * 20})`); // Adjust translation as needed
+                        // Assuming each legend item needs 20px of height:
+                        legendSvg.attr("height", legendData.length * 20 + 10); // Adjust height based on items
 
-                            legend.append("rect")
-                                .attr("x", 0)
-                                .attr("width", 18)
-                                .attr("height", 18)
-                                .attr("fill", d => colorMapping[d]);
+                        const legend = legendSvg.selectAll(".legend")
+                            .data(legendData)
+                            .enter().append("g")
+                            .attr("class", "legend")
+                            .attr("transform", (d, i) => `translate(10, ${i * 20})`); // Adjust translation as needed
 
-                            legend.append("text")
-                                .attr("x", 24) // Position text to the right of the rectangles
-                                .attr("y", 9)
-                                .attr("dy", ".35em")
-                                .text(d => `${d.split('_').slice(0, -1).join(' ')} (${d.split('_').pop() === '2534' ? '25-34' : '35-44'})`);
+                        legend.append("rect")
+                            .attr("x", 0)
+                            .attr("width", 18)
+                            .attr("height", 18)
+                            .attr("fill", d => colorMapping[d]);
+
+                        legend.append("text")
+                            .attr("x", 24) // Position text to the right of the rectangles
+                            .attr("y", 9)
+                            .attr("dy", ".35em")
+                            .text(d => `${d.split('_').slice(0, -1).join(' ')} (${d.split('_').pop() === '2534' ? '25-34' : '35-44'})`);
                     }
 
 
@@ -785,4 +825,5 @@
         requestData();
     </script>
 </body>
+
 </html>
