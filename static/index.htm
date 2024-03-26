@@ -137,6 +137,30 @@
             color: #d26a8d;
             margin: 20px 0;
         }
+
+        .checkbox-group {
+            display: inline-block;
+            margin-right: 20px;
+        }
+
+        .clearfix::after {
+            content: "";
+            clear: both;
+            display: table;
+        }
+
+        .checkbox-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .checkbox-group label input[type="checkbox"] {
+            margin-right: 5px;
+        }
+
+        .checkbox-group-heading {
+            font-weight: bold;
+        }
     </style>
 </head>
 
@@ -146,35 +170,39 @@
         <svg id="linesvg" height="500" width="800"></svg>
         <svg id="bargraph" width="800" height="500" viewBox="-40 -90 800 620"></svg>
         <form id="checkboxForm">
-            <label for="HS">
-                <input type="checkbox" id="HS" value="HS">
-                High school graduates or less
-            </label><br>
-            <label for="SC">
-                <input type="checkbox" id="SC" value="SC">
-                Some college
-            </label><br>
-            <label for="BAp">
-                <input type="checkbox" id="BAp" value="BAp">
-                Bachelor's degree or more
-            </label><br>
-            <label for="White">
-                <input type="checkbox" id="White" value="White">
-                Non-Hispanic white
-            </label><br>
-            <label for="Black">
-                <input type="checkbox" id="Black" value="Black">
-                Black or African American
-            </label><br>
-            <label for="Hisp">
-                <input type="checkbox" id="Hisp" value="Hisp">
-                Hispanic
-            </label><br>
+            <div class="checkbox-group" id="educationGroup">
+                <strong class="checkbox-group-heading">Level of Education</strong>
+                <label for="HS">
+                    <input type="checkbox" id="HS" value="HS">
+                    High school graduates or less (HS)
+                </label>
+                <label for="SC">
+                    <input type="checkbox" id="SC" value="SC">
+                    Some college (SC)
+                </label>
+                <label for="BAp">
+                    <input type="checkbox" id="BAp" value="BAp">
+                    Bachelor's degree or more (BAp)
+                </label>
+            </div>
+            <div class="checkbox-group" id="ethnicityGroup">
+                <strong class="checkbox-group-heading">Ethnicity</strong>
+                <label for="White">
+                    <input type="checkbox" id="White" value="White">
+                    Non-Hispanic white (White)
+                </label>
+                <label for="Black">
+                    <input type="checkbox" id="Black" value="Black">
+                    Black or African American (Black)
+                </label>
+                <label for="Hisp">
+                    <input type="checkbox" id="Hisp" value="Hisp">
+                    Hispanic (Hisp)
+                </label>
+            </div>
         </form>
         <svg id="legend" width="800" height="100"></svg>
     </div>
-
-
 
 
     <script>
@@ -586,7 +614,6 @@
                                 .attr('transform', `translate(${margins.left},${margins.top})`)
                                 .attr("visibility", "hidden");
                         }
-
                     }
 
                     const lineHS_2534 = d3.line()
@@ -690,6 +717,72 @@
                         value3544Marker.attr("visibility", "hidden");
                     }
 
+                    const legendSvg = d3.select("#legend");
+
+                    const legendData = ["all_2534", "all_3544"];
+                    console.log(legendData)
+
+                    // Assuming each legend item needs 20px of height:
+                    legendSvg.attr("height", legendData.length * 20 + 10);
+
+                    const legend = legendSvg.selectAll(".legend")
+                        .data(legendData)
+                        .enter().append("g")
+                        .attr("class", "legend")
+                        .attr("transform", (d, i) => `translate(10, ${i * 20})`);
+
+                    legend.append("rect")
+                        .attr("x", 0)
+                        .attr("width", 18)
+                        .attr("height", 18)
+                        .attr("opacity", d => d.indexOf("2534") !== -1 ? 0.5 : 1)
+                        .attr("fill", d => colorMapping[d]);
+
+                    legend.append("text")
+                        .attr("x", 24)
+                        .attr("y", 9)
+                        .attr("dy", ".35em")
+                        .text(d => `${d.split('_').slice(0, -1).join(' ')} (${d.split('_').pop() === '2534' ? '25-34 year olds' : '35-44 year olds'})`);
+
+                    function updateLegend() {
+
+                        // const legendSvg = d3.select("#legend");
+                        legendSvg.selectAll("*").remove(); // Clear previous legends
+
+                        const checked = getCheckedCheckboxes();
+
+                        let checkedlist = checked.map(item => {
+                            return [item + '_2534', item + '_3544'];
+                        });
+                        checkedlist = checkedlist.flat();
+                        checkedlist.unshift('all_3544')
+                        checkedlist.unshift('all_2534')
+                        console.log(checkedlist)
+
+                        // Assuming each legend item needs 20px of height:
+                        legendSvg.attr("height", checkedlist.length * 20 + 10);
+
+                        const legend = legendSvg.selectAll(".legend")
+                            .data(checkedlist)
+                            .enter().append("g")
+                            .attr("class", "legend")
+                            .attr("transform", (d, i) => `translate(10, ${i * 20})`);
+
+                        legend.append("rect")
+                            .attr("x", 0)
+                            .attr("width", 18)
+                            .attr("height", 18)
+                            .attr("opacity", d => d.indexOf("2534") !== -1 ? 0.5 : 1)
+                            .attr("fill", d => colorMapping[d]);
+
+                        legend.append("text")
+                            .attr("x", 24)
+                            .attr("y", 9)
+                            .attr("dy", ".35em")
+                            .text(d => `${d.split('_').slice(0, -1).join(' ')} (${d.split('_').pop() === '2534' ? '25-34 year olds' : '35-44 year olds'})`)
+
+                    }
+
                     function updateBarGraph(selectedYears, data) {
                         const benchmarkCategories = ["all_2534", "all_3544"];
                         const svg = d3.select("#bargraph");
@@ -710,6 +803,8 @@
                                 barChartData.push({ category, value: 1 - row[category], year: row.year });
                             });
                         });
+
+                        console.log(barChartData)
 
                         filteredData.forEach(row => {
                             checkedCategories.forEach(key => {
@@ -773,44 +868,20 @@
                         svg.append("g")
                             .call(d3.axisLeft(y).ticks(null, "%"));
 
-                        const legendSvg = d3.select("#legend");
-                        legendSvg.selectAll("*").remove(); // Clear previous legends
+                        updateLegend();
 
-                        const legendData = [...new Set(barChartData.map(d => d.category))];
-
-                        // Assuming each legend item needs 20px of height:
-                        legendSvg.attr("height", legendData.length * 20 + 10);
-
-                        const legend = legendSvg.selectAll(".legend")
-                            .data(legendData)
-                            .enter().append("g")
-                            .attr("class", "legend")
-                            .attr("transform", (d, i) => `translate(10, ${i * 20})`);
-
-                        legend.append("rect")
-                            .attr("x", 0)
-                            .attr("width", 18)
-                            .attr("height", 18)
-                            .attr("opacity", d => d.indexOf("2534") !== -1 ? 0.5 : 1)
-                            .attr("fill", d => colorMapping[d]);
-
-                        legend.append("text")
-                            .attr("x", 24)
-                            .attr("y", 9)
-                            .attr("dy", ".35em")
-                            .text(d => `${d.split('_').slice(0, -1).join(' ')} (${d.split('_').pop() === '2534' ? '25-34 year olds' : '35-44 year olds'})`);
                     }
-
-
 
                     document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
                         checkbox.addEventListener('change', function () {
                             if (this.checked) {
                                 // console.log(this.value)
                                 becomeVisible(this.value)
+                                updateBarGraph(selectedYears, data)
                             } else {
                                 // console.log(`Checkbox ${this.value} is unchecked`)
                                 becomeInvisible(this.value)
+                                updateBarGraph(selectedYears, data)
                             }
                         });
                     });
