@@ -868,6 +868,25 @@
                         svg.append("g")
                             .call(d3.axisLeft(y).ticks(null, "%"));
 
+                        svg.append("text")
+                            .attr("class", "chart-title")
+                            .attr("x", lineWidth / 2 + 40)
+                            .attr("y", -50)
+                            .attr("text-anchor", "middle")
+                            .style("font-weight", "bold")
+                            .style("font-size", "25px")
+                            .style("fill", "black")
+                            .text("Percentage of a Population Married in Selected Years");
+
+                        svg.append("text")
+                            .attr("class", "y-axis-title")
+                            .attr("transform", "rotate(-90)")
+                            .attr("x", -lineHeight / 2 - 70)
+                            .attr("y", -50)
+                            .attr("text-anchor", "middle")
+                            .style("font-size", "20px")
+                            .text("Percentage of Population Married");
+
                         updateLegend();
 
                     }
